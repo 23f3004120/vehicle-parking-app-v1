@@ -1,0 +1,60 @@
+{% extends "user_dashboard.html" %}
+
+{% block content %}
+<style>
+    body {
+        background: url("{{ url_for('static', filename='images/parking_spot.jpg') }}") no-repeat center center fixed;
+        background-size: cover;
+    }
+
+    .transparent-form {
+        background-color: rgba(255, 255, 255, 0.85);  /* Light translucent background */
+        padding: 30px;
+        border-radius: 10px;
+        max-width: 600px;
+        margin: 40px auto;
+        box-shadow: 0 0 20px rgba(0,0,0,0.3);
+    }
+
+    .form-title {
+        background-color: rgba(44, 44, 44, 0.9);  /* Dark header like pillars */
+        color: #fff;
+        padding: 15px;
+        border-radius: 8px 8px 0 0;
+        text-align: center;
+        margin: -30px -30px 30px -30px;
+    }
+</style>
+
+<div class="transparent-form">
+    <div class="form-title">
+        <h4 class="m-0">🚗 Reserve Parking Spot</h4>
+    </div>
+    <form method="POST" action="">
+        <div class="mb-2">
+            <label>User ID</label>
+            <input type="text" class="form-control" value="{{ user.id }}" readonly>
+        </div>
+        <div class="mb-2">
+            <label>Prime Location</label>
+            <input type="text" class="form-control" value="{{ lot.prime_location }}" readonly>
+        </div>
+        <div class="mb-2">
+            <label>Parking Lot ID</label>
+            <input type="text" class="form-control" value="{{ lot.id }}" readonly>
+        </div>
+        <div class="mb-2">
+            <label>Parking Spot ID</label>
+            <input type="text" class="form-control" value="{{ spot.id }}" readonly>
+        </div>
+        <div class="mb-3">
+            <label>Vehicle Number</label>
+            <input type="text" class="form-control" name="vehicle_number" required placeholder="Enter your vehicle number">
+        </div>
+        <div class="d-flex justify-content-between">
+            <button type="submit" class="btn btn-success">Reserve</button>
+            <a href="{{ url_for('user_dashboard') }}" class="btn btn-secondary">Cancel</a>
+        </div>
+    </form>
+</div>
+{% endblock %}

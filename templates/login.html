@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Login</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            font-family: 'Roboto', sans-serif;
+            box-sizing: border-box;
+        }
+
+        body, html {
+            height: 100%;
+            background-image: url("{{ url_for('static', filename='images/parking_background.jpg') }}");
+            background-size: cover;
+            background-position: center;
+        }
+
+        .login-container {
+            height: 100vh;
+            display: flex;
+            justify-content: flex-end;
+            align-items: center;
+            padding-right: 15%;
+            padding-bottom: 5%;
+        }
+
+        .login-box {
+            background: rgba(255, 255, 255, 0.85);
+            padding: 40px;
+            width: 350px;
+            border-radius: 15px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+        }
+
+        .login-box h2 {
+            text-align: center;
+            margin-bottom: 25px;
+            color: #333;
+        }
+
+        .login-box input[type="email"],
+        .login-box input[type="password"] {
+            width: 100%;
+            padding: 12px;
+            margin: 10px 0;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+        }
+
+        .login-box button {
+            width: 100%;
+            padding: 12px;
+            margin-top: 15px;
+            border: none;
+            border-radius: 8px;
+            background-color: #2b70db;
+            color: white;
+            font-size: 16px;
+            cursor: pointer;
+        }
+
+        .login-box button:hover {
+            background-color: #1f54b7;
+        }
+
+        .login-box .register-link {
+            text-align: center;
+            margin-top: 15px;
+        }
+
+        .login-box .register-link a {
+            color: #2b70db;
+            text-decoration: none;
+        }
+
+        .login-box .register-link a:hover {
+            text-decoration: underline;
+        }
+        .flash-warning {
+        color: red;
+        margin-bottom: 10px;
+        font-size: 14px;
+        text-align: center;
+        }
+        .flash-success {
+        color: green;
+        margin-bottom: 10px;
+        font-size: 14px;
+        text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <div class="login-container">
+        <form class="login-box" method="POST" action="/login">
+            <h2>Login</h2>
+
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    {% for category, message in messages %}
+                        <p class="flash-{{category}}">{{ message }}</p>
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
+
+            <input type="email" name="email" placeholder="Email ID" required>
+            <input type="password" name="password" placeholder="Password" required>
+            <button type="submit">Login</button>
+            <div class="register-link">
+                <p>New user? <a href="/register">Create account</a></p>
+            </div>
+        </form>
+    </div>
+</body>
+</html>

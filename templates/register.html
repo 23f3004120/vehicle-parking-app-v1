@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Signup</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            font-family: 'Roboto', sans-serif;
+            box-sizing: border-box;
+        }
+
+        body, html {
+            height: 100%;
+            background-image: url("{{ url_for('static', filename='images/parking_background.jpg') }}");
+            background-size: cover;
+            background-position: center;
+        }
+
+        .signup-container {
+            height: 100vh;
+            display: flex;
+            justify-content: flex-end;
+            align-items: center;
+            padding-right: 15%;
+            padding-bottom: 5%;
+        }
+
+        .signup-box {
+            background: rgba(255, 255, 255, 0.85);
+            padding: 40px;
+            width: 350px;
+            border-radius: 15px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+        }
+
+        .signup-box h2 {
+            text-align: center;
+            margin-bottom: 25px;
+            color: #333;
+        }
+
+        .signup-box input[type="text"],
+        .signup-box input[type="email"],
+        .signup-box input[type="password"] {
+            width: 100%;
+            padding: 12px;
+            margin: 10px 0;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+        }
+
+        .signup-box button {
+            width: 100%;
+            padding: 12px;
+            margin-top: 15px;
+            border: none;
+            border-radius: 8px;
+            background-color: #2b70db;
+            color: white;
+            font-size: 16px;
+            cursor: pointer;
+        }
+
+        .signup-box button:hover {
+            background-color: #1f54b7;
+        }
+
+        .signup-box .login-link {
+            text-align: center;
+            margin-top: 15px;
+        }
+
+        .signup-box .login-link a {
+            color: #2b70db;
+            text-decoration: none;
+        }
+
+        .signup-box .login-link a:hover {
+            text-decoration: underline;
+        }
+
+        .flash-success {
+        color: green;
+        margin-bottom: 10px;
+        font-size: 14px;
+        text-align: center;
+        }
+
+        .flash-warning {
+        color: red;
+        margin-bottom: 10px;
+        font-size: 14px;
+        text-align: center;
+        }
+        
+
+    </style>
+</head>
+<body>
+    <div class="signup-container">
+        <form class="signup-box" method="POST" action="/register">
+            <h2>Signup</h2>
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    {% for category,message in messages %}
+                        <div class="flash-{{category}}">{{ message }}</div>
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
+
+            <input type="email" name="email" placeholder="Email ID" required>
+            <input type="password" name="password" placeholder="Password" required>
+            <input type="text" name="name" placeholder="Name" required>
+            <input type="text" name="address" placeholder="Address">
+            <input type="text" name="pincode" placeholder="Pincode">
+            <button type="submit">Register</button>
+            <div class="login-link">
+                <p>Already have an account? <a href="/login">Login here!</a></p>
+            </div>
+        </form>
+    </div>
+</body>
+</html>
