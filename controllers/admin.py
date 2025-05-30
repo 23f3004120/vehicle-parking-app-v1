@@ -112,6 +112,7 @@ def view_spot(spot_id):
         reservation = Reservation.query.filter_by(spot_id=spot_id, leaving_time=None).first()
         return render_template('occupied_spot.html', spot=spot, reservation=reservation)
     
+    
 @admin_bp.route('/delete-spot/<int:spot_id>', methods=['POST','DELETE'])
 def delete_spot(spot_id):
     spot = ParkingSpot.query.get_or_404(spot_id)
