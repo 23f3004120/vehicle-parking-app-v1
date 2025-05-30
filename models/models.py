@@ -1,4 +1,4 @@
-from controllers.database import db
+from models.database import db
 from datetime import datetime
 from flask_login import UserMixin
 
@@ -31,7 +31,7 @@ class ParkingSpot(db.Model):
     lot_id = db.Column(db.Integer, db.ForeignKey('parking_lots.id'), nullable=False)
     status = db.Column(db.String(1), default='A')
 
-    reservation = db.relationship('Reservation', backref='spot', uselist=False, lazy=True)
+    reservations = db.relationship('Reservation', backref='spot', cascade='all, delete-orphan', lazy=True)
 
 class Reservation(db.Model):
     __tablename__ = 'reservations'
@@ -39,7 +39,7 @@ class Reservation(db.Model):
     spot_id = db.Column(db.Integer, db.ForeignKey('parking_spots.id'), nullable=False)
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
     vehicle_number = db.Column(db.String(20), nullable=False)
-    parking_time = db.Column(db.DateTime, default=datetime.utcnow)
+    parking_time = db.Column(db.DateTime, default=datetime.now)
     leaving_time = db.Column(db.DateTime, nullable=True)
     total_cost = db.Column(db.Float, nullable=True)
 
