@@ -1,0 +1,81 @@
+{% extends "admin_dashboard.html" %}
+
+{% block content %}
+<div class="container mt-4">
+    <h3 class="text-center text-black mb-3">🔍 Search</h3>
+    <form method="GET" action="{{ url_for('admin.search') }}" class="row g-3 justify-content-center">
+        <div class="col-md-2">
+            <select name="type" class="form-select">
+                <option value="user">User ID</option>
+                <option value="lot">Prime Location</option>
+            </select>
+        </div>
+        <div class="col-md-5">
+            <input type="text" name="query" class="form-control" placeholder="Enter User ID or Location" required>
+        </div>
+        <div class="col-md-2">
+            <button type="submit" class="btn btn-warning w-100">Search</button>
+        </div>
+    </form>
+</div>
+
+{% if user %}
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <h4 class="text-center mb-4">User Found</h4>
+            <table class="table table-bordered table-striped">
+                <tr><th>User ID</th><td>{{ user.id }}</td></tr>
+                <tr><th>Name</th><td>{{ user.name }}</td></tr>
+                <tr><th>Email</th><td>{{ user.email }}</td></tr>
+                <tr><th>Address</th><td>{{ user.address }}</td></tr>
+                <tr><th>Pincode</th><td>{{ user.pincode }}</td></tr>
+            </table>
+        </div>
+    </div>
+</div>
+
+{% elif parking_lots %}
+<div class="container mt-4">
+    <h4 class="text-center mt-4">Search Results for: "{{ request.args.get('query') }}"</h4>
+    <div class="row row-cols-1 row-cols-md-3 g-4 mt-3 justify-content-center">
+        {% for lot in parking_lots %}
+        <div class="col">
+            <div class="card h-100 shadow border-secondary">
+                <div class="card-header bg-secondary text-white text-center fw-semibold fs-5 py-2">
+                    Parking-{{ lot.id }}
+                </div>
+                <div class="card-body">
+                    <p class="card-text mb-1"><strong>Location:</strong> {{ lot.prime_location }}</p>
+                    <p class="card-text mb-1">
+                        <strong>Occupied Spots:</strong>
+                        {{ lot.spots | selectattr('status', 'equalto', 'O') | list | length }}/{{ lot.spots | length }}
+                    </p>
+
+                    <div>
+                        <a href="{{ url_for('admin.edit_parking_lot', lot_id=lot.id) }}" class="text-primary">Edit</a> |
+                        <a href="{{ url_for('admin.delete_parking_lot', lot_id=lot.id) }}" class="text-danger"
+                           onclick="return confirm('Are you sure you want to delete this parking lot?')">Delete</a>
+                    </div>
+
+                    <div class="d-flex flex-wrap gap-1 mt-3 position-relative">
+                        {% for spot in lot.spots %}
+                        <form method="get" action="{{ url_for('admin.view_spot', spot_id=spot.id) }}">
+                            <button type="submit"
+                                    class="btn btn-sm {% if spot.status == 'A' %}btn-success{% else %}btn-danger{% endif %}">
+                                {{ spot.status }}
+                            </button>
+                        </form>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% else %}
+    <p class="text-center text-muted mt-4">No results found.</p>
+{% endif %}
+
+{% endblock %}
