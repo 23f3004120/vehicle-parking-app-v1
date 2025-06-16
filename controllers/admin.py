@@ -2,13 +2,17 @@
 from flask import Blueprint, render_template,request, redirect, url_for, flash
 from flask_login import login_required, current_user
 from models.models import *
+from sqlalchemy import func
+import plotly
+import plotly.graph_objs as go
+import json
 
 admin_bp = Blueprint('admin', __name__, url_prefix='/admin')
 
 @admin_bp.route('/dashboard')
 def admin_dashboard() :
     if not current_user.is_admin:
-        flash('Access Denied: Admins only', 'danger')
+        flash('Access Denied: Admins only', 'warning')
         return redirect(url_for('login'))
     
     parking_lots = ParkingLot.query.all()
@@ -112,7 +116,7 @@ def view_spot(spot_id):
         reservation = Reservation.query.filter_by(spot_id=spot_id, leaving_time=None).first()
         return render_template('occupied_spot.html', spot=spot, reservation=reservation)
     
-    
+
 @admin_bp.route('/delete-spot/<int:spot_id>', methods=['POST','DELETE'])
 def delete_spot(spot_id):
     spot = ParkingSpot.query.get_or_404(spot_id)
@@ -148,6 +152,25 @@ def search():
     else:
         flash("Invalid search type", "warning")
         return redirect(url_for('admin.admin_dashboard'))
+    
+@admin_bp.route('/summary')
+def admin_summary():
+    # Calculate total revenue per parking lot
+    revenue_data = db.session.query(
+        ParkingSpot.lot_id,
+        func.sum(Reservation.total_cost)
+        ).join(ParkingSpot).filter(Reservation.total_cost != None).group_by(ParkingSpot.lot_id).all()
+
+    lot_ids = [f"Lot {lot_id}" for lot_id, i in revenue_data]
+    revenues = [total or 0 for j, total in revenue_data]
+
+    # Plotly bar chart
+    fig = go.Figure([go.Bar(x=lot_ids, y=revenues, marker_color='teal')])
+    fig.update_layout(xaxis_title="Parking Lot", yaxis_title="Revenue (₹)")
+
+
+    graphJSON = json.dumps(fig, cls=plotly.utils.PlotlyJSONEncoder)
+    return render_template('admin_summary.html', graphJSON=graphJSON)
 
 
 

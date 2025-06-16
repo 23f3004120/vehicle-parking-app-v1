@@ -2,6 +2,10 @@ from flask import Blueprint, render_template, redirect, url_for, request, flash
 from flask_login import login_required, current_user
 from datetime import datetime
 from models.models import *
+from sqlalchemy import func
+import json
+import plotly
+import plotly.graph_objs as go
 
 user_bp = Blueprint('user', __name__, url_prefix='/user')
 
@@ -9,7 +13,7 @@ user_bp = Blueprint('user', __name__, url_prefix='/user')
 @login_required
 def user_dashboard() :
     if current_user.is_admin:
-        flash('Admins are not allowed to access the user dashboard.', 'danger')
+        flash('Admins are not allowed to access the user dashboard.', 'warning')
         return redirect(url_for('admin.admin_dashboard'))
     user = current_user
     query = request.args.get('query')
@@ -104,7 +108,7 @@ def release_reservation(reservation_id):
     if request.method == 'POST':
         reservation.leaving_time = datetime.now()
         reservation.calculate_total_cost(reservation.spot.lot.price_per_hour)
-        reservation.spot.status = 'A'  # Mark as available
+        reservation.spot.status = 'A'  
         db.session.commit()
         flash("Parking spot released successfully.", "success")
         return redirect(url_for('user.user_dashboard'))
@@ -132,3 +136,27 @@ def user_editprofile():
         return redirect(url_for('user.user_dashboard'))
 
     return render_template('user_editprofile.html',username=current_user.name, user=user)
+
+@user_bp.route('/user_summary')
+def user_summary():
+    user = current_user
+    # Query reservation count per lot used by this user
+    results = (
+        db.session.query(ParkingSpot.lot_id, func.count(Reservation.id))
+        .join(ParkingSpot)
+        .filter(Reservation.user_id == current_user.id)
+        .group_by(ParkingSpot.lot_id)
+        .all()
+    )
+
+    # Format data for chart
+    x = [f"Lot {lot_id}" for lot_id, i in results]
+    y = [count for j, count in results]
+
+    fig = go.Figure([go.Bar(x=x, y=y, marker_color='green')])
+    fig.update_layout(xaxis_title="Parking Lot",
+                      yaxis_title="Times Used")
+
+    graphJSON = json.dumps(fig, cls=plotly.utils.PlotlyJSONEncoder)
+
+    return render_template('user_summary.html',username=user.name, graphJSON=graphJSON)
