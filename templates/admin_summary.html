@@ -1,0 +1,14 @@
+{% extends "admin_dashboard.html" %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2 class="mb-4 text-center">📊 Parking Lot Revenue</h2>
+    <div id="bar-chart"></div>
+</div>
+
+<script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+<script>
+    var plotData = {{ graphJSON | safe }};
+    Plotly.newPlot('bar-chart', plotData.data, plotData.layout, {responsive: true});
+</script>
+{% endblock %}
